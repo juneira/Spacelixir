@@ -177,6 +177,6 @@ defmodule Spacelixir do
   defp generate_meteors_list(meteors) do
     meteors
     |> Enum.map(fn meteor -> %{x: meteor.x, y: meteor.y + 1} end)
-    |> Enum.filter(fn meteor -> meteor.y < 50 end)
+    |> Enum.filter(fn meteor -> meteor.y < 38 end)
   end
 end
