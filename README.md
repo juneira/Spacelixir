@@ -4,5 +4,5 @@ A simple game of spacecraft build with elixir + ncurses.
 Demo
 ----
 <p align="center">
-  <img src="https://media.giphy.com/media/pslhKvLIcf73mnHqJV/giphy.gif">
+  <img src="https://j.gifs.com/Jy6xV2.gif">
 </p>
