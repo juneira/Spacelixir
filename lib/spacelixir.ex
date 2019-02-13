@@ -32,7 +32,7 @@ defmodule Spacelixir do
   end
 
   def schedule_next_tick do
-    Process.send_after(self(), :tick, 100)
+    Process.send_after(self(), :tick, 33)
   end
 
   defp handle_key(?w, state), do: update_spacecraft(state, state.spacecraft.x,     state.spacecraft.y - 1)
@@ -109,6 +109,7 @@ defmodule Spacelixir do
     |> update_shots()
     |> destroy_meteors()
     |> update_meteors()
+    |> verify_if_is_game_over()
   end
 
   def update_time(state) do
@@ -134,26 +135,53 @@ defmodule Spacelixir do
   defp had_destroyed_meteor?(state) do
     state.meteors
     |> Enum.any?(fn meteor ->
-      Enum.any?(state.shots, fn shot -> meteor_was_destroyed?(meteor, shot) end)
+      Enum.any?(state.shots, fn shot ->
+        meteor_was_destroyed?(meteor, shot)
+      end)
     end)
+  end
+
+  defp verify_if_is_game_over(state) do
+    if spacecraft_was_hit?(state) || any_meteor_destroyed_planet?(state.meteors), do: stateInit(), else: state
+  end
+
+  def spacecraft_was_hit?(state) do
+    state.meteors
+    |> Enum.any?(fn meteor -> spacecraft_was_destroyed?(meteor, state.spacecraft) end)
   end
 
   defp valid_meteors_list(state) do
     state.meteors
     |> Enum.filter(fn meteor ->
-      not Enum.any?(state.shots, fn shot -> meteor_was_destroyed?(meteor, shot) end)
+      not Enum.any?(state.shots, fn shot ->
+        meteor_was_destroyed?(meteor, shot)
+      end)
     end)
   end
 
   defp valid_shots_list(state) do
     state.shots
     |> Enum.filter(fn shot ->
-      not Enum.any?(state.meteors, fn meteor -> meteor_was_destroyed?(meteor, shot) end)
+      not Enum.any?(state.meteors, fn meteor ->
+        meteor_was_destroyed?(meteor, shot)
+      end)
     end)
   end
 
   defp meteor_was_destroyed?(meteor, shot) do
     (meteor.x <= shot.x && shot.x <= meteor.x+2) && (meteor.y <= shot.y && shot.y <= meteor.y+1)
+  end
+
+  defp spacecraft_was_destroyed?(meteor, spacecraft) do
+    (meteor.x <= spacecraft.x && spacecraft.x <= meteor.x+2) && (meteor.y <= spacecraft.y && spacecraft.y <= meteor.y+1) ||
+      (meteor.x <= spacecraft.x+2 && spacecraft.x+2 <= meteor.x+2) && (meteor.y <= spacecraft.y && spacecraft.y <= meteor.y+1) ||
+      (meteor.x <= spacecraft.x && spacecraft.x <= meteor.x+2) && (meteor.y <= spacecraft.y+1 && spacecraft.y+1 <= meteor.y+1) ||
+      (meteor.x <= spacecraft.x+2 && spacecraft.x <= meteor.x+2) && (meteor.y <= spacecraft.y+1 && spacecraft.y+1 <= meteor.y+1)
+  end
+
+  defp any_meteor_destroyed_planet?(meteors) do
+    meteors
+    |> Enum.any?(fn meteor -> meteor.y >= 38 end)
   end
 
   defp add_meteor(state) do
@@ -177,6 +205,5 @@ defmodule Spacelixir do
   defp generate_meteors_list(meteors) do
     meteors
     |> Enum.map(fn meteor -> %{x: meteor.x, y: meteor.y + 1} end)
-    |> Enum.filter(fn meteor -> meteor.y < 38 end)
   end
 end
