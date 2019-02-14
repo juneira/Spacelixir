@@ -1,3 +1,16 @@
+matrix:
+  include:
+    os: linux
+    addons:
+      apt:
+        sources:
+          - ubuntu-toolchain-r-test
+        packages:
+          - g++-6
+    env:
+      - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++
+before_install:
+  - eval "${MATRIX_EVAL}"
 language: elixir
 elixir:
   - '1.8'
