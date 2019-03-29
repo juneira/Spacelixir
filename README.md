@@ -1,5 +1,5 @@
 # Spacelixir
-A simple game of spacecraft build with elixir + ncurses.
+A simple game of spacecraft builded with elixir + ncurses.
 
 Demo
 ----
